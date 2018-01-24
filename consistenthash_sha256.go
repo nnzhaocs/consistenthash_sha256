@@ -1,4 +1,4 @@
-package ConsistantHash_Sha256
+package ConsistentHash_Sha256
 
 import (
     "crypto/sha256"
@@ -137,7 +137,7 @@ func (listp * idList)get(value id) id{
 }
 
 //Consistant Hash type, public
-type ConsistantHash struct {
+type ConsistentHash struct {
     hashes idList //Consistant hash object
     owners map[id]string //used to convert pseudo id to node
     valid map[string]bool //used to keep track of nodes. node name is used as key
@@ -147,9 +147,9 @@ type ConsistantHash struct {
     sync.RWMutex //Ensures object is atomic
 }
 
-//Creates a new ConsistantHash with default values of 1 for pseudoIDs and replicas
-func New() *ConsistantHash {
-    ret := new(ConsistantHash)
+//Creates a new ConsistentHash with default values of 1 for pseudoIDs and replicas
+func New() *ConsistentHash {
+    ret := new(ConsistentHash)
     ret.pseudoIDs = defaultPsuedoIDs
     ret.replicas = defaultReplicas
     ret.count = 0
@@ -158,7 +158,7 @@ func New() *ConsistantHash {
     return ret
 }
 
-func (c * ConsistantHash) SetPseudoIDs(pseudoIDs int) error {
+func (c * ConsistentHash) SetPseudoIDs(pseudoIDs int) error {
     if pseudoIDs < 1 {
         return fmt.Errorf("pseudoIDs cannot be negative")
     }
@@ -168,7 +168,7 @@ func (c * ConsistantHash) SetPseudoIDs(pseudoIDs int) error {
     return nil
 }
 
-func (c * ConsistantHash) SetReplicas(replicas int) error {
+func (c * ConsistentHash) SetReplicas(replicas int) error {
     if c.pseudoIDs < 1 {
         return fmt.Errorf("Replicas cannot be negative")
     }
@@ -178,25 +178,25 @@ func (c * ConsistantHash) SetReplicas(replicas int) error {
     return nil
 }
 
-func (c * ConsistantHash) GetPseudoIDs() int {
+func (c * ConsistentHash) GetPseudoIDs() int {
     c.RLock()
     defer c.RUnlock()
     return c.pseudoIDs
 }
 
-func (c * ConsistantHash) GetReplicas() int {
+func (c * ConsistentHash) GetReplicas() int {
     c.RLock()
     defer c.RUnlock()
     return c.replicas
 }
 
-func (c * ConsistantHash) GetNumberOfNodes() int {
+func (c * ConsistentHash) GetNumberOfNodes() int {
     c.RLock()
     defer c.RUnlock()
     return c.count
 }
 
-func (c * ConsistantHash) AddNode(name string) error {
+func (c * ConsistentHash) AddNode(name string) error {
     c.Lock()
     defer c.Unlock()
 
@@ -219,7 +219,7 @@ func (c * ConsistantHash) AddNode(name string) error {
     return nil
 }
 
-func (c * ConsistantHash) RemoveNode(name string) {
+func (c * ConsistentHash) RemoveNode(name string) {
     c.Lock()
     defer c.Unlock()
     if _, ok := c.valid[name]; ok {
@@ -237,7 +237,7 @@ func (c * ConsistantHash) RemoveNode(name string) {
     }
 }
 
-func (c * ConsistantHash) IsValidNode(name string) bool {
+func (c * ConsistentHash) IsValidNode(name string) bool {
     c.RLock()
     defer c.RUnlock()
     if val, ok := c.valid[name]; ok {
@@ -246,7 +246,7 @@ func (c * ConsistantHash) IsValidNode(name string) bool {
     return false
 }
 
-func (c * ConsistantHash) InvalidateNode(name string) {
+func (c * ConsistentHash) InvalidateNode(name string) {
     c.Lock()
     defer c.Unlock()
     if _, ok := c.valid[name]; ok {
@@ -256,7 +256,7 @@ func (c * ConsistantHash) InvalidateNode(name string) {
     }
 }
 
-func (c * ConsistantHash) ValidateNode(name string) {
+func (c * ConsistentHash) ValidateNode(name string) {
     c.Lock()
     defer c.Unlock()
     if _, ok := c.valid[name]; ok {
@@ -265,7 +265,7 @@ func (c * ConsistantHash) ValidateNode(name string) {
     }
 }
 
-func (c * ConsistantHash) Hash(key string) (string, error) {
+func (c * ConsistentHash) Hash(key string) (string, error) {
     c.RLock()
     defer c.RUnlock()
     idkey, err := fromString(key)
@@ -302,7 +302,7 @@ func in(list []string, item string) bool {
     return false
 }
 
-func (c * ConsistantHash) GetReplicaNodes(key string) ([]string, error) {
+func (c * ConsistentHash) GetReplicaNodes(key string) ([]string, error) {
     var ret []string
     c.RLock()
     defer c.RUnlock()

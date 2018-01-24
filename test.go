@@ -1,9 +1,9 @@
-package ConsistantHash_Sha256
+package ConsistentHash_Sha256
 /*
 package main
 
 import (
-    ch "./consistant_hash"
+    ch "./consistent_hash"
     other "stathat.com/c/consistent"
     "math/rand"
     "fmt"
@@ -21,12 +21,11 @@ func main() {
     myc := make(map[string]int)
     theirc := make(map[string]int)
     for _, i := range nodes {
-        rand.Read(sid)
-        fmt.Printf("node: %s, ID: %s\n", i, fmt.Sprintf("%x", sid))
+        fmt.Printf("node: %s\n", i)
         myc[i] = 0
         theirc[i] = 0
         c2.Add(i)
-        c1.AddNode(i, fmt.Sprintf("%x", sid))
+        c1.AddNode(i)
     }
    for i := 0; i < million; i++ {
         rand.Read(sid)

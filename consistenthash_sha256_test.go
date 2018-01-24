@@ -1,4 +1,4 @@
-package ConsistantHash_Sha256
+package ConsistentHash_Sha256
 
 import(
     "fmt"

@@ -55,7 +55,7 @@ class consistent_sha256:
         return self.idmap[self.sortedIDs[index]]
 
     def hash_chain(self, seedID):
-        IDs = [hashlib.sha256(seedID).digegst()]
+        IDs = [hashlib.sha256(seedID).digest()]
 
         for i in range(self.pseudoIDs - 1):
             IDs.append(hashlib.sha256(IDs[-1]).digest())
