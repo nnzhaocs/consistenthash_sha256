@@ -16,10 +16,7 @@ class consistent_sha256:
         upper = len(self.sortedIDs) - 1
         if upper == -1:
             return 0
-        if key > self.sortedIDs[upper]:
-                return 0
-        
-        elif key <= self.sortedIDs[0]:
+        elif key <= self.sortedIDs[0] or key > self.sortedIDs[upper]:
                 return 0
         elif key == self.sortedIDs[upper]:
             return upper
@@ -58,19 +55,19 @@ class consistent_sha256:
         return self.idmap[self.sortedIDs[index]]
 
     def hash_chain(self, seedID):
-        IDs = [bytearray.fromhex(seedID)]
+        IDs = [hashlib.sha256(seedID).digegst()]
 
         for i in range(self.pseudoIDs - 1):
             IDs.append(hashlib.sha256(IDs[-1]).digest())
 
         return sorted(IDs)
 
-    def add_node(self, ID, seedID):
-        ids = self.hash_chain(seedID)
+    def add_node(self, ID):
+        ids = self.hash_chain(ID)
         for i in ids:
             h = binascii.hexlify(i)
             bisect.insort(self.sortedIDs, h)
-            self.idmap[h] = (ID, seedID)
+            self.idmap[h] = ID
 
     def del_node(self, seedID):
         ids = self.hash_chain(seedID)
@@ -95,11 +92,11 @@ if __name__ == '__main__':
 
     a = consistent_sha256(3, 100)
 
-    a.add_node('node1', hashlib.sha256('o').hexdigest())
-    a.add_node('node2', hashlib.sha256('p').hexdigest())
-    a.add_node('node3', hashlib.sha256('q').hexdigest())
-    a.add_node('node4', hashlib.sha256('r').hexdigest())
-    a.add_node('node5', hashlib.sha256('s').hexdigest())
+    a.add_node('node1')
+    a.add_node('node2')
+    a.add_node('node3')
+    a.add_node('node4')
+    a.add_node('node5')
     d = {
         'node1': 0,
         'node2': 0,
@@ -109,12 +106,12 @@ if __name__ == '__main__':
     }
 
     for i in range(1000):
-        node = a.write_hash(hashlib.sha256(str(i)).hexdigest())[0]
+        node = a.write_hash(hashlib.sha256(str(i)).hexdigest())
         d[node] += 1
     print_stats(d, 1000)
     d = clear(d)
     for i in range(1000):
-        node = a.read_hash(hashlib.sha256(str(i)).hexdigest())[0]
+        node = a.read_hash(hashlib.sha256(str(i)).hexdigest())
         d[node] += 1
     print_stats(d, 1000)
     d = clear(d)
@@ -122,11 +119,11 @@ if __name__ == '__main__':
     node = a.read_hash(hashlib.sha256('a').hexdigest())
     a.del_node(node[1])
     for i in range(1000):
-        node = a.write_hash(hashlib.sha256(str(i)).hexdigest())[0]
+        node = a.write_hash(hashlib.sha256(str(i)).hexdigest())
         d[node] += 1
     print_stats(d, 1000)
     d = clear(d)
     for i in range(1000):
-        node = a.write_hash(hashlib.sha256(str(i)).hexdigest())[0]
+        node = a.write_hash(hashlib.sha256(str(i)).hexdigest())
         d[node] += 1
     print_stats(d, 1000)

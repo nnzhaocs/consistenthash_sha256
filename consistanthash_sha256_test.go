@@ -124,16 +124,11 @@ func TestHash(t *testing.T) {
     node3 := "node3"
     node4 := "node4"
     node5 := "node5"
-    n1seed := "0000000000000000000000000000000000000000000000000000000000000000"
-    n2seed := "1111111111111111111111111111111111111111111111111111111111111111"
-    n3seed := "2222222222222222222222222222222222222222222222222222222222222222"
-    n4seed := "3333333333333333333333333333333333333333333333333333333333333333"
-    n5seed := "4444444444444444444444444444444444444444444444444444444444444444"
-    c.AddNode(node1, n1seed)
-    c.AddNode(node2, n2seed)
-    c.AddNode(node3, n3seed)
-    c.AddNode(node4, n4seed)
-    c.AddNode(node5, n5seed)
+    c.AddNode(node1)
+    c.AddNode(node2)
+    c.AddNode(node3)
+    c.AddNode(node4)
+    c.AddNode(node5)
 
     fmt.Printf("PsuedoIDs: %d, Replicas: %d, node count: %d\n", c.GetPseudoIDs(), c.GetReplicas(), c.GetNumberOfNodes())
     a := make(map[string][]id)

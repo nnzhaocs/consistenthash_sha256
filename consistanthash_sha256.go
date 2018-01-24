@@ -141,7 +141,6 @@ type ConsistantHash struct {
     hashes idList //Consistant hash object
     owners map[id]string //used to convert pseudo id to node
     valid map[string]bool //used to keep track of nodes. node name is used as key
-    seedIDs map[string] id //used to keep track of node name and seedID
     pseudoIDs int //How many ID's a single node has, should be set with SetPseudoIDs function
     replicas int //How many replicas to forward push requests to, should be set with SetReplicas function
     count int //How many nodes are in system. Not sure if needed
@@ -156,7 +155,6 @@ func New() *ConsistantHash {
     ret.count = 0
     ret.owners = make(map[id]string)
     ret.valid = make(map[string]bool)
-    ret.seedIDs = make(map[string]id)
     return ret
 }
 
@@ -198,7 +196,7 @@ func (c * ConsistantHash) GetNumberOfNodes() int {
     return c.count
 }
 
-func (c * ConsistantHash) AddNode(name, seedIDstr string) error {
+func (c * ConsistantHash) AddNode(name string) error {
     c.Lock()
     defer c.Unlock()
 
@@ -207,12 +205,7 @@ func (c * ConsistantHash) AddNode(name, seedIDstr string) error {
             c.valid[name] = true
         }
     } else {
-        seedID, err := fromString(seedIDstr)
-        if err != nil {
-            return err
-        }
-        c.seedIDs[name] = seedID
-
+        seedID := id(sha256.Sum256([]byte(name)))
         c.valid[name] = true
         c.owners[seedID] = name
         c.hashes.insert(seedID)
@@ -232,8 +225,7 @@ func (c * ConsistantHash) RemoveNode(name string) {
     if _, ok := c.valid[name]; ok {
         //Remove from everything
         delete(c.valid, name)
-        seedID := c.seedIDs[name]
-        delete(c.seedIDs, name)
+        seedID := id(sha256.Sum256([]byte(name)))
         delete(c.owners, seedID)
         c.hashes.remove(seedID)
         c.count--
@@ -258,6 +250,7 @@ func (c * ConsistantHash) InvalidateNode(name string) {
     c.Lock()
     defer c.Unlock()
     if _, ok := c.valid[name]; ok {
+        fmt.Printf("Invalidating: %s\n", name)
         c.valid[name] = false
         c.count--
     }

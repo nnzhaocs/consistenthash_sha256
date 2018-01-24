@@ -1,3 +1,5 @@
+package ConsistantHash_Sha256
+/*
 package main
 
 import (
@@ -52,4 +54,4 @@ func main() {
         fmt.Printf("%v\n", v)
     }
 
-}
+}*/
