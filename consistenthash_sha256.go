@@ -5,6 +5,8 @@ import (
     "sync"
     "encoding/hex"
     "fmt"
+    "math/rand"
+    "time"
 )
 
 //pseudoid type and helper functions
@@ -144,6 +146,7 @@ type ConsistentHash struct {
     pseudoIDs int //How many ID's a single node has, should be set with SetPseudoIDs function
     replicas int //How many replicas to forward push requests to, should be set with SetReplicas function
     count int //How many nodes are in system. Not sure if needed
+    r * rand.Rand
     sync.RWMutex //Ensures object is atomic
 }
 
@@ -155,6 +158,8 @@ func New() *ConsistentHash {
     ret.count = 0
     ret.owners = make(map[id]string)
     ret.valid = make(map[string]bool)
+    s := rand.NewSource(time.Now().Unix())
+    ret.r = rand.New(s)
     return ret
 }
 
@@ -319,6 +324,7 @@ func (c * ConsistentHash) GetReplicaNodes(key string) ([]string, error) {
     i := 0
     if c.valid[node] == true {
         ret = append(ret, node)
+        i++
     }
 
     firstIndex := index
@@ -335,4 +341,38 @@ func (c * ConsistentHash) GetReplicaNodes(key string) ([]string, error) {
         }
     }
     return ret, nil
+}
+
+//Randomly selects one node which should have the replica
+func (c * ConsistentHash) ReadHash(key string) (string, error) {
+    nodes, err := c.GetReplicaNodes(key)
+    if err != nil {
+        return "", err
+    }
+    //I don't think rand is thread safe but it shouldn't matter much
+    return nodes[c.r.Intn(len(nodes))], nil
+}
+
+//Returns list of all valid nodes
+func (c * ConsistentHash) GetNodes() []string {
+    keys := make([]string, len(c.valid))
+    i := 0
+    for k, v := range c.valid {
+        if v {
+            keys[i] = k
+            i++
+        }
+    }
+    return keys[:i]
+}
+
+//Returns list of all nodes regardless of validity
+func (c * ConsistentHash) GetAllNodes() []string {
+    keys := make([]string, len(c.valid))
+    i := 0
+    for k := range c.valid {
+        keys[i] = k
+        i++
+    }
+    return keys
 }
