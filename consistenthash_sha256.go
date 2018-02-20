@@ -13,7 +13,7 @@ import (
 //pseudoids are 256 bits
 const idsize = 32
 const defaultReplicas = 3 //default value for number of replicas is 3
-const defaultPsuedoIDs = 100 //default value for number of pseudoIDs per node is 100
+const defaultPsuedoIDs = 50 //default value for number of pseudoIDs per node is 100
 
 type id [idsize]byte
 
